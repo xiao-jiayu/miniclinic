@@ -64,6 +64,10 @@
                         <button th:if="${appt.status == 'BOOKED'}"
                                 th:data-id="${appt.apptId}"
                                 onclick="cancelAppointment(this)" class="btn btn-warning btn-sm">取消</button>
+                        <button th:if="${appt.status == 'BOOKED'}"
+                                th:data-id="${appt.apptId}"
+                                onclick="completeAppointment(this)" class="btn btn-success btn-sm" style="margin-left: 5px;">完成</button>
+
                         <!-- 您可以在此處添加其他操作按鈕，例如完成掛號 -->
                     </td>
                 </tr>
@@ -97,6 +101,32 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('取消掛號時發生網路錯誤。');
+            });
+        }
+
+        function completeAppointment(button) {
+            if (!confirm('確定要標記此掛號為「完成」嗎？')) {
+                return;
+            }
+            const apptId = button.dataset.id;
+            fetch(`/api/appointments/${apptId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'COMPLETED' })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('掛號已標記為完成！');
+                    location.reload(); // 重新整理頁面以顯示更新後的狀態
+                } else {
+                    response.json().then(errorData => {
+                        alert('標記失敗: ' + (errorData.message || '未知錯誤'));
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('標記掛號完成時發生網路錯誤。');
             });
         }
     </script>
