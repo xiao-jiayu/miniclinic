@@ -6,11 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
-
-import org.springframework.web.bind.annotation.RequestParam;
 
 import tw.edu.fju.miniclinic.model.Appointment;
 import tw.edu.fju.miniclinic.model.AppointmentRepository;
@@ -23,7 +22,7 @@ import java.util.Map;
 
 @RestController
 public class AppointmentApiController {
-    
+
     @Autowired
     private DoctorRepository doctorRepo;
 
@@ -41,15 +40,15 @@ public class AppointmentApiController {
         if (doctorId != null && !doctorId.isBlank()) {
             Doctor doctor = doctorRepo.findById(doctorId).orElse(null);
             if (doctor == null) {
-                return List.of(); // 醫師 ID 不存在，回傳空列表
+                return List.of();
             }
             return appointmentRepo.findByDoctor(doctor);
         }
         return appointmentRepo.findAll();
     }
 
-    @GetMapping("api/appointments/count")
-    public Map<String, Long> getAppointmentCount(){
+    @GetMapping("/api/appointments/count")
+    public Map<String, Long> getAppointmentCount() {
         return Map.of("count", appointmentRepo.count());
     }
 
@@ -66,7 +65,6 @@ public class AppointmentApiController {
             return ResponseEntity.notFound().build();
         }
 
-        // 只能修改自己的掛號
         if (!appt.getDoctor().getDoctorId().equals(loggedInDoctorId)) {
             return ResponseEntity.status(403).build();
         }
